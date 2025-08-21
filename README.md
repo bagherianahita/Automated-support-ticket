@@ -1,33 +1,20 @@
-# Automated-support-ticket
-support ticket to reduce response time
-clear architecture, 
-training code, 
-inference API (FastAPI), 
-AWS Lambda adapter, and 
-the tech decisions that hit two tough constraints: class imbalance and <200 ms latency.
+# Automated-support-ticket to reduce response time
 
-High-level design
+training code, 
+
+inference API (FastAPI), AWS Lambda adapter, and the tech decisions that hit two tough constraints: class imbalance and <200 ms latency.
 
 Goal: Auto-triage support tickets by Urgency (high|normal|low) and Topic ( billing|bug|feature_request|account), 
 then route to the right queue in real time.
-
-Stack chosed (lean + fast):
-
 Python for ML + API
-
 scikit-learn (linear models) + HashingVectorizer (tiny memory, zero fit on vocab)
-
 spaCy only for lightweight text cleanup (optional; avoid heavy models on Lambda)
-
 FastAPI for a minimal REST API
-
 Mangum to run FastAPI on AWS Lambda (API Gateway)
-
 class_weight='balanced' + threshold tuning to handle class imbalance
-
 Provisioned Concurrency (or warmed function) to hit p99 < 200 ms SLA
 ----------------
-Why not large transformer models here? 
+Why not large transformer models here?  (hugging face transformer library)
 Cold start + model size would hurt latency and cost. 
 A tuned linear model on hashed features is ~10–50× faster at inference and very stable.
 ------------------------
@@ -42,42 +29,23 @@ normalize case, strip URLs, collapse whitespace, keep a few signal tokens like !
 Vectorization: HashingVectorizer(ngram_range=(1,2), alternate_sign=False)
 
 Pros: no fitted vocabulary (small artifact), ultra-fast, stable memory footprint.
-HashingVectorizer
 HashingVectorizer(ngram_range=(1,2), alternate_sign=False)
-
-unigram: "payment", "failed"
-
-bigram: "payment failed"
-
 -------------------------------------------------------------------------------------------
-
 Handling class imbalance  
-
 Model-side: class_weight='balanced' (re-weights minority class).
-
 Probability calibration: CalibratedClassifierCV gives reliable probabilities.
-
 Threshold tuning: Choose high-urgency threshold to meet business precision (≥0.85) while maximizing recall.
 --------------------------------------------------------------------
-
 Data-side (if available): Augment minority examples (paraphrases), or re-sample.
-
 Monitoring: Track precision/recall per class in production; update threshold as class priors drift.
 ----------------------------------------------------------------------
-
 Latency optimization checklist
-
 Small, CPU-friendly models (linear, hashed features).
-
 One vectorizer instance used by both models (pipeline-level).
-
 Keep models loaded as globals (no per-request disk I/O).
-
 JSON-only I/O, no heavy post-processing.
-
 Lambda Provisioned Concurrency; short function memory burst (1024–2048 MB) for faster CPU.
-
-Warm-up pings every 5 minutes if you can’t use provisioned concurrency.
+Warm-up pings every 5 minutes (if can’t use provisioned concurrency.)
 -----------------------------------------------------------------------------
 
 Minimal requirements.txt
@@ -109,80 +77,10 @@ def test_combine():
     assert "product:billing" in t
     assert "plan:pro" in t
 --------------------------------------------------------------------
-
-
-  (cheat sheet)
-
-“We used hashed n-grams + linear models to guarantee sub-200 ms latency on Lambda and keep artifacts tiny.”
-
-“To address class imbalance, 
-we used balanced class weights + calibrated probabilities and tuned the high-urgency threshold
- to meet business precision while improving recall of critical tickets.”
-
-“The FastAPI + Mangum adapter lets us run the exact same code locally and on AWS Lambda/API Gateway with Provisioned Concurrency to avoid cold start spikes.”
-
-“We log per-class precision/recall and percent routed per queue to spot drift and re-tune thresholds monthly.”
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+used hashed n-grams + linear models to guarantee sub-200 ms latency on Lambda and keep artifacts tiny.
+To address class imbalance, 
+used balanced class weights + calibrated probabilities and tuned the high-urgency threshold
+to meet business precision while improving recall of critical tickets.”
+The FastAPI + Mangum adapter lets run the exact same code locally and on 
+AWS Lambda/API Gateway with Provisioned Concurrency to avoid cold start spikes.”
+log per-class precision/recall and percent routed per queue to spot drift and re-tune thresholds monthly.”
