@@ -1,8 +1,6 @@
 # Automated-support-ticket to reduce response time
 
-training code, 
-
-inference API (FastAPI), AWS Lambda adapter, and the tech decisions that hit two tough constraints: class imbalance and <200 ms latency.
+inference API (FastAPI), AWS Lambda adapter, and the tech decisions that hit two constraints: class imbalance and <200 ms latency.
 
 Goal: Auto-triage support tickets by Urgency (high|normal|low) and Topic ( billing|bug|feature_request|account), 
 then route to the right queue in real time.
