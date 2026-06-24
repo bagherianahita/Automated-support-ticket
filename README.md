@@ -31,6 +31,11 @@ Open **POST /triage** — default example values are pre-filled. Models auto-tra
 
 Pre-trained artifacts are included in `artifacts/` for instant startup.
 
+| | URL |
+|---|-----|
+| **API docs (Swagger)** | http://localhost:8000/docs |
+| **Health check** | http://localhost:8000/health |
+
 Example:
 
 ```bash
