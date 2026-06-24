@@ -1,0 +1,16 @@
+subject,body,product,plan,region,urgency_label,topic_label
+"Cannot login","I forgot my password and reset link expired",saas,pro,na,high,account
+"Billing question","Why was I charged twice this month?",saas,pro,na,normal,billing
+"App crashes on startup","After update the app closes immediately on Windows 11",mobile,basic,eu,high,bug
+"Feature request","Please add dark mode to dashboard",saas,enterprise,na,low,feature_request
+"Payment failed","Card declined but money was taken from account",saas,pro,apac,high,billing
+"Slow performance","Reports take 5 minutes to load",saas,enterprise,na,normal,bug
+"Cancel subscription","I want to cancel before renewal",saas,basic,na,normal,account
+"API error 500","POST /v1/orders returns internal server error",saas,enterprise,na,high,bug
+"Invoice missing","Need invoice for last quarter for accounting",saas,pro,eu,normal,billing
+"Account locked","Too many failed login attempts",saas,basic,na,high,account
+"Export data","How do I export all my records to CSV?",saas,pro,na,low,feature_request
+"Webhook not firing","Integration stopped sending events yesterday",saas,enterprise,na,high,bug
+"Upgrade plan","Need to move from basic to pro mid-cycle",saas,basic,na,normal,billing
+"Wrong email on file","Please update contact email for notifications",saas,pro,na,normal,account
+"Dashboard bug","Charts show NaN for last 7 days",saas,enterprise,na,normal,bug
