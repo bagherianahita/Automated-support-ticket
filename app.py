@@ -1,6 +1,8 @@
 """FastAPI inference API for support ticket triage."""
 
 import json
+import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Literal, Optional
@@ -8,25 +10,43 @@ from typing import Literal, Optional
 import joblib
 import uvicorn
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from train import combine_fields
 
 ARTIFACTS = Path("artifacts")
-urgency_clf = joblib.load(ARTIFACTS / "urgency_clf.joblib")
-topic_clf = joblib.load(ARTIFACTS / "topic_clf.joblib")
-with open(ARTIFACTS / "urgency_threshold.json", encoding="utf-8") as f:
-    HIGH_THR = float(json.load(f).get("high_threshold", 0.5))
 
-app = FastAPI(title="Ticket Triage API", version="1.0.0")
+
+def _ensure_artifacts() -> None:
+    if (ARTIFACTS / "urgency_clf.joblib").exists():
+        return
+    subprocess.check_call([sys.executable, "train.py"], cwd=Path(__file__).parent)
+
+
+def _load_models():
+    _ensure_artifacts()
+    urgency = joblib.load(ARTIFACTS / "urgency_clf.joblib")
+    topic = joblib.load(ARTIFACTS / "topic_clf.joblib")
+    with open(ARTIFACTS / "urgency_threshold.json", encoding="utf-8") as f:
+        thr = float(json.load(f).get("high_threshold", 0.5))
+    return urgency, topic, thr
+
+
+urgency_clf, topic_clf, HIGH_THR = _load_models()
+
+app = FastAPI(
+    title="Ticket Triage API",
+    version="1.0.0",
+    description="Try POST /triage with the default example in /docs — no setup required.",
+)
 
 
 class TicketIn(BaseModel):
-    subject: str
-    body: str
-    product: Optional[str] = None
-    plan: Optional[str] = None
-    region: Optional[str] = None
+    subject: str = Field(default="Cannot login", example="Cannot login")
+    body: str = Field(default="I forgot my password and the reset link expired.", example="Reset link expired")
+    product: Optional[str] = Field(default="saas", example="saas")
+    plan: Optional[str] = Field(default="pro", example="pro")
+    region: Optional[str] = Field(default="na", example="na")
 
 
 class TriageOut(BaseModel):
@@ -47,7 +67,7 @@ def route_decision(urgency: str, topic: str) -> str:
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok", "models_loaded": True}
 
 
 @app.post("/triage", response_model=TriageOut)

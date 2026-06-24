@@ -20,13 +20,16 @@
 
 ---
 
-## Quick start
+## Quick start (employers — no API keys)
 
 ```bash
 pip install -r requirements.txt
-python train.py              # trains on data/tickets.csv
-uvicorn app:app --reload     # http://localhost:8000/docs
+uvicorn app:app --reload    # http://localhost:8000/docs
 ```
+
+Open **POST /triage** — default example values are pre-filled. Models auto-train on first run if needed.
+
+Pre-trained artifacts are included in `artifacts/` for instant startup.
 
 Example:
 

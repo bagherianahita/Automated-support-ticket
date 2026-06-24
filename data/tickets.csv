@@ -1,16 +1,41 @@
 subject,body,product,plan,region,urgency_label,topic_label
-"Cannot login","I forgot my password and reset link expired",saas,pro,na,high,account
-"Billing question","Why was I charged twice this month?",saas,pro,na,normal,billing
-"App crashes on startup","After update the app closes immediately on Windows 11",mobile,basic,eu,high,bug
-"Feature request","Please add dark mode to dashboard",saas,enterprise,na,low,feature_request
-"Payment failed","Card declined but money was taken from account",saas,pro,apac,high,billing
-"Slow performance","Reports take 5 minutes to load",saas,enterprise,na,normal,bug
-"Cancel subscription","I want to cancel before renewal",saas,basic,na,normal,account
-"API error 500","POST /v1/orders returns internal server error",saas,enterprise,na,high,bug
-"Invoice missing","Need invoice for last quarter for accounting",saas,pro,eu,normal,billing
-"Account locked","Too many failed login attempts",saas,basic,na,high,account
-"Export data","How do I export all my records to CSV?",saas,pro,na,low,feature_request
-"Webhook not firing","Integration stopped sending events yesterday",saas,enterprise,na,high,bug
-"Upgrade plan","Need to move from basic to pro mid-cycle",saas,basic,na,normal,billing
-"Wrong email on file","Please update contact email for notifications",saas,pro,na,normal,account
-"Dashboard bug","Charts show NaN for last 7 days",saas,enterprise,na,normal,bug
+Cannot login,I forgot my password and reset link expired,saas,pro,na,high,account
+Billing question,Why was I charged twice this month?,saas,pro,na,normal,billing
+App crashes on startup,After update the app closes immediately on Windows 11,mobile,basic,eu,high,bug
+Feature request,Please add dark mode to dashboard,saas,enterprise,na,low,feature_request
+Payment failed,Card declined but money was taken from account,saas,pro,apac,high,billing
+Slow performance,Reports take 5 minutes to load,saas,enterprise,na,normal,bug
+Cancel subscription,I want to cancel before renewal,saas,basic,na,normal,account
+API error 500,POST /v1/orders returns internal server error,saas,enterprise,na,high,bug
+Invoice missing,Need invoice for last quarter for accounting,saas,pro,eu,normal,billing
+Account locked,Too many failed login attempts,saas,basic,na,high,account
+Export data,How do I export all my records to CSV?,saas,pro,na,low,feature_request
+Webhook not firing,Integration stopped sending events yesterday,saas,enterprise,na,high,bug
+Upgrade plan,Need to move from basic to pro mid-cycle,saas,basic,na,normal,billing
+Wrong email on file,Please update contact email for notifications,saas,pro,na,normal,account
+Dashboard bug,Charts show NaN for last 7 days,saas,enterprise,na,normal,bug
+Login timeout,Session expires too quickly on mobile app,mobile,pro,na,high,account
+Refund request,Please refund duplicate charge from last week,saas,pro,na,high,billing
+Dark theme bug,Dark mode text is unreadable on settings page,saas,basic,na,low,bug
+Add SSO,We need SAML SSO for enterprise plan,saas,enterprise,na,low,feature_request
+Password reset,Reset email never arrived in inbox,saas,pro,na,high,account
+Billing cycle,When does my annual plan renew?,saas,pro,na,normal,billing
+Crash on export,App crashes when exporting large CSV,saas,enterprise,eu,high,bug
+API rate limit,Getting 429 errors on production API,saas,enterprise,na,high,bug
+New user invite,Cannot invite teammates to workspace,saas,pro,na,normal,account
+Pricing question,What is the cost to add 10 seats?,saas,enterprise,na,normal,billing
+Keyboard shortcut,Please add keyboard shortcuts for power users,saas,pro,na,low,feature_request
+Data sync issue,Mobile app not syncing with web dashboard,mobile,pro,apac,normal,bug
+Security alert,Unrecognized login from new device,saas,pro,na,high,account
+Tax invoice,Need VAT invoice for EU purchase,saas,enterprise,eu,normal,billing
+Onboarding help,How do I connect our CRM integration?,saas,pro,na,normal,feature_request
+Server outage,Status page shows degraded performance,saas,enterprise,na,high,bug
+Delete account,Please delete my account and all data,saas,basic,na,normal,account
+Coupon code,Promo code not applying at checkout,saas,basic,na,normal,billing
+Report bug,Filters reset when switching tabs,saas,pro,na,normal,bug
+Bulk import,CSV import fails on 10k rows,saas,enterprise,na,high,bug
+Role permissions,Admin cannot assign editor role,saas,enterprise,na,normal,account
+Annual discount,Do you offer nonprofit pricing?,saas,basic,na,low,billing
+Mobile login,Face ID login stopped working,mobile,basic,na,high,account
+Latency spike,API latency increased since Tuesday,saas,enterprise,na,high,bug
+Widget request,Embed dashboard widget on our intranet,saas,enterprise,na,low,feature_request

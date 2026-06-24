@@ -45,8 +45,14 @@ def find_best_threshold(
     target_precision: float = 0.80,
 ):
     proba = pipe.predict_proba(X_valid)
-    classes = pipe.named_steps["clf"].classes_
-    idx = int(np.where(classes == positive_label)[0])
+    clf = pipe.named_steps["clf"]
+    classes = getattr(clf, "classes_", None)
+    if classes is None and hasattr(clf, "calibrated_classifiers_"):
+        classes = clf.calibrated_classifiers_[0].estimator.classes_
+    idx_arr = np.where(classes == positive_label)[0]
+    if len(idx_arr) == 0:
+        return (0.5, 0.0, 0.0)
+    idx = int(idx_arr[0])
     scores = proba[:, idx]
     best = (0.5, 0.0, 0.0)
     for thr in np.linspace(0.2, 0.9, 36):
@@ -74,15 +80,14 @@ def main():
         axis=1,
     )
 
-    X = df["text"].values
-    y_urgency = df["urgency_label"].values
-    y_topic = df["topic_label"].values
+    X = df["text"].tolist()
+    y_urgency = df["urgency_label"].tolist()
+    y_topic = df["topic_label"].tolist()
 
-    Xtr, Xte, yU_tr, yU_te = train_test_split(
-        X, y_urgency, test_size=0.2, random_state=42, stratify=y_urgency
-    )
-    _, _, yT_tr, yT_te = train_test_split(
-        X, y_topic, test_size=0.2, random_state=42, stratify=y_topic
+    stratify_u = y_urgency if df["urgency_label"].value_counts().min() >= 2 else None
+
+    Xtr, Xte, yU_tr, yU_te, yT_tr, yT_te = train_test_split(
+        X, y_urgency, y_topic, test_size=0.2, random_state=42, stratify=stratify_u
     )
 
     vectorizer = HashingVectorizer(
@@ -101,7 +106,11 @@ def main():
         tol=1e-3,
         random_state=42,
     )
-    urg_clf = Pipeline([("vec", vectorizer), ("clf", CalibratedClassifierCV(urg_base, cv=3))])
+    cv_folds = min(3, min(df["urgency_label"].value_counts()))
+    if cv_folds >= 2:
+        urg_clf = Pipeline([("vec", vectorizer), ("clf", CalibratedClassifierCV(urg_base, cv=cv_folds))])
+    else:
+        urg_clf = Pipeline([("vec", vectorizer), ("clf", urg_base)])
     top_clf = Pipeline(
         [
             ("vec", vectorizer),
@@ -118,6 +127,8 @@ def main():
     print(classification_report(yT_te, top_clf.predict(Xte)))
 
     thr, p, r = find_best_threshold(urg_clf, Xte, yU_te, positive_label="high", target_precision=0.85)
+    if thr == 0.5 and p == 0.0:
+        thr = 0.5
     print(f"High-urgency threshold: {thr:.2f} (precision={p:.2f}, recall={r:.2f})")
 
     artifacts = Path("artifacts")
