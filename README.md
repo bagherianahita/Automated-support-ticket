@@ -1,4 +1,4 @@
-# Automated Support Ticket Triage
+﻿# Automated Support Ticket Triage
 
 **ML-powered ticket routing** — classifies urgency and topic in under 200ms using lightweight scikit-learn models, designed for AWS Lambda deployment.
 <img width="1211" height="903" alt="image" src="https://github.com/user-attachments/assets/662dae0f-911f-4ee0-b7eb-ff6daed17323" />
@@ -21,7 +21,7 @@ http://localhost:8010/
 
 ---
 
-## Quick start (employers — no API keys)
+## Quick start
 
 ```bash
 pip install -r requirements.txt
