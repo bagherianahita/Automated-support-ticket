@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Support Ticket Triage Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+  <div class="max-w-5xl mx-auto p-8">
+    <header class="mb-8 flex flex-wrap gap-4 justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold">Automated Support Ticket Triage</h1>
+        <p class="text-slate-500">ML prototype — urgency, topic, and routing queue (no API keys)</p>
+      </div>
+      <div id="status" class="px-4 py-2 rounded-lg bg-blue-100 text-blue-700 font-semibold">Checking...</div>
+    </header>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="bg-white p-6 rounded-xl shadow border">
+        <h2 class="text-xl font-semibold mb-4">Ticket input</h2>
+
+        <label class="block text-sm font-medium mb-1">Sample ticket</label>
+        <select id="sample" class="w-full border rounded-lg p-2 mb-4">
+          <option value="login">Cannot login (account)</option>
+          <option value="billing">Double charged (billing)</option>
+          <option value="outage">Production outage (incident)</option>
+          <option value="feature">Feature request (low urgency)</option>
+        </select>
+
+        <label class="block text-sm font-medium mb-1">Subject</label>
+        <input id="subject" class="w-full border rounded-lg p-2 mb-3" />
+
+        <label class="block text-sm font-medium mb-1">Body</label>
+        <textarea id="body" class="w-full border rounded-lg p-2 mb-3 h-32"></textarea>
+
+        <div class="grid grid-cols-3 gap-2 mb-4">
+          <div>
+            <label class="text-xs font-medium">Product</label>
+            <input id="product" class="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label class="text-xs font-medium">Plan</label>
+            <input id="plan" class="w-full border rounded p-2" />
+          </div>
+          <div>
+            <label class="text-xs font-medium">Region</label>
+            <input id="region" class="w-full border rounded p-2" />
+          </div>
+        </div>
+
+        <button id="btnTriage" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg">
+          Run triage
+        </button>
+        <p class="text-xs text-slate-500 mt-3">
+          Developers: <a class="underline" href="/docs">Swagger /docs</a> ·
+          <a class="underline" href="/health">/health</a>
+        </p>
+      </div>
+
+      <div id="results" class="bg-white p-6 rounded-xl shadow border">
+        <h2 class="text-xl font-semibold mb-4">Triage result</h2>
+        <p id="loading" class="text-slate-500 text-sm mb-4">Running demo triage…</p>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+            <p class="text-xs uppercase text-red-600 font-bold">Urgency</p>
+            <p id="urgency" class="text-2xl font-bold text-red-700">—</p>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+            <p class="text-xs uppercase text-emerald-600 font-bold">Topic</p>
+            <p id="topic" class="text-2xl font-bold text-emerald-700">—</p>
+          </div>
+          <div class="p-4 bg-amber-50 rounded-lg border border-amber-200">
+            <p class="text-xs uppercase text-amber-600 font-bold">Confidence</p>
+            <p id="confidence" class="text-2xl font-bold text-amber-700">—</p>
+          </div>
+          <div class="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+            <p class="text-xs uppercase text-indigo-600 font-bold">Latency</p>
+            <p id="latency" class="text-2xl font-bold text-indigo-700">—</p>
+          </div>
+        </div>
+        <div class="p-4 bg-slate-900 text-green-300 rounded-lg font-mono text-sm">
+          <p>Route queue: <span id="route">—</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SAMPLES = {
+      login: {
+        subject: "Cannot login",
+        body: "I forgot my password and the reset link expired.",
+        product: "saas", plan: "pro", region: "na"
+      },
+      billing: {
+        subject: "Charged twice this month",
+        body: "My Pro plan was billed twice on the same day. Please refund the duplicate charge.",
+        product: "saas", plan: "pro", region: "eu"
+      },
+      outage: {
+        subject: "URGENT: API down for all EU customers",
+        body: "Production API returning 503 since 06:00 UTC. Multiple enterprise clients affected.",
+        product: "saas", plan: "enterprise", region: "eu"
+      },
+      feature: {
+        subject: "Export to CSV",
+        body: "Would love a CSV export for monthly reports. Not blocking our workflow.",
+        product: "saas", plan: "starter", region: "na"
+      }
+    };
+
+    function loadSample(key) {
+      const s = SAMPLES[key] || SAMPLES.login;
+      document.getElementById('subject').value = s.subject;
+      document.getElementById('body').value = s.body;
+      document.getElementById('product').value = s.product;
+      document.getElementById('plan').value = s.plan;
+      document.getElementById('region').value = s.region;
+    }
+
+    async function runTriage() {
+      document.getElementById('loading').textContent = 'Running triage…';
+      const payload = {
+        subject: document.getElementById('subject').value,
+        body: document.getElementById('body').value,
+        product: document.getElementById('product').value,
+        plan: document.getElementById('plan').value,
+        region: document.getElementById('region').value,
+      };
+
+      const res = await fetch('/triage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        document.getElementById('loading').textContent = 'Triage failed — is the API running?';
+        return;
+      }
+      const data = await res.json();
+      document.getElementById('loading').textContent = '';
+      document.getElementById('urgency').textContent = data.urgency;
+      document.getElementById('topic').textContent = data.topic;
+      document.getElementById('confidence').textContent = (data.confidence * 100).toFixed(1) + '%';
+      document.getElementById('latency').textContent = data.latency_ms + ' ms';
+      document.getElementById('route').textContent = data.route_queue;
+    }
+
+    fetch('/health')
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then(() => {
+        document.getElementById('status').textContent = 'API Online';
+        loadSample('login');
+        runTriage();
+      })
+      .catch(() => {
+        document.getElementById('status').textContent = 'API Offline';
+        document.getElementById('status').className = 'px-4 py-2 rounded-lg bg-red-100 text-red-700 font-semibold';
+        document.getElementById('loading').textContent = 'Start the server: uvicorn app:app --port 8010';
+      });
+
+    document.getElementById('sample').onchange = (e) => {
+      loadSample(e.target.value);
+      runTriage();
+    };
+
+    document.getElementById('btnTriage').onclick = runTriage;
+  </script>
+</body>
+</html>

@@ -25,17 +25,24 @@ http://localhost:8010/
 
 ```bash
 pip install -r requirements.txt
-uvicorn app:app --reload    # http://localhost:8010/docs
+uvicorn app:app --port 8010 --host 127.0.0.1
 ```
 
-Open **POST /triage** — default example values are pre-filled. Models auto-train on first run if needed.
+Or:
 
-Pre-trained artifacts are included in `artifacts/` for instant startup.
+```bash
+python app.py
+```
+
+Open the **browser demo** (pre-filled ticket) or use Swagger **POST /triage**. Pre-trained models are in `artifacts/`.
 
 | | URL |
 |---|-----|
+| **Web UI (demo)** | http://localhost:8010 |
 | **API docs (Swagger)** | http://localhost:8010/docs |
 | **Health check** | http://localhost:8010/health |
+
+> Port **8010** avoids conflicts with other local APIs (e.g. MESO on 8000).
 
 Example:
 
