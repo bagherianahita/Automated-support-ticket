@@ -24,7 +24,7 @@
 
 ```bash
 pip install -r requirements.txt
-uvicorn app:app --reload    # http://localhost:8000/docs
+uvicorn app:app --reload    # http://localhost:8010/docs
 ```
 
 Open **POST /triage** — default example values are pre-filled. Models auto-train on first run if needed.
@@ -33,13 +33,13 @@ Pre-trained artifacts are included in `artifacts/` for instant startup.
 
 | | URL |
 |---|-----|
-| **API docs (Swagger)** | http://localhost:8000/docs |
-| **Health check** | http://localhost:8000/health |
+| **API docs (Swagger)** | http://localhost:8010/docs |
+| **Health check** | http://localhost:8010/health |
 
 Example:
 
 ```bash
-curl -X POST http://localhost:8000/triage \
+curl -X POST http://localhost:8010/triage \
   -H "Content-Type: application/json" \
   -d "{\"subject\":\"Cannot login\",\"body\":\"Reset link expired\"}"
 ```
